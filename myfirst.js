@@ -10,14 +10,13 @@ http.createServer(function (req, res) {
         html += data;
         var q = url.parse(req.url, true)
         
-        if(q.pathname != "/" && q.pathname != undefined){
-            return loadView(q.pathname);
-        }
-        return new Promise((res, rej) => {
-            res('404 Page not found');
-        });
-    })
-    .then((data) => {
+        return loadView(q.pathname);
+        
+    }).catch((rej) => {
+        return fs.promises.readFile('./views/404.html', {encoding: 'UTF-8'}, (err, data) => {
+            return data;
+        })
+    }).then((data) => {
         html += data;
         return loadView('footer');
     }).then((data) => {
@@ -30,7 +29,12 @@ http.createServer(function (req, res) {
 }).listen(8081); 
 
 
-async function loadView(viewName) {
+function loadView(viewName) {
+
+    if(viewName == "/"){
+        viewName = 'home';
+    }
+
     return Promise.resolve(fs.promises.readFile('./views/' + viewName + '.html', {encoding: 'UTF-8'}, (err, data) => {
         if (err) throw err;
         return data;
