@@ -2,6 +2,7 @@ var http = require('http');
 var dt = require('./modules/dateModule');
 var url = require('url');
 var fs = require('fs'); 
+var uc = require('upper-case')
 
 http.createServer(function (req, res) {
     var html = "";
@@ -19,7 +20,7 @@ http.createServer(function (req, res) {
             return data;
         })
     }).then((data) => {
-        html += data;
+        html += codeResponse == 404 ? uc.upperCase(data) : data;
         return loadView('footer');
     }).then((data) => {
         html += data;
