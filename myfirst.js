@@ -4,8 +4,8 @@ var url = require('url');
 var fs = require('fs'); 
 
 http.createServer(function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
     var html = "";
+    var codeResponse = 200;
     loadView('header').then((data) => {
 
         html += data;
@@ -14,8 +14,8 @@ http.createServer(function (req, res) {
         return loadView(q.pathname);
         
     }).catch((rej) => {
-        res.writeHead(404, {'Content-Type': 'text/html'});
-        return fs.promises.readFile('./views/404.html', {encoding: 'UTF-8'}, (err, data) => {
+        codeResponse = 404;
+        return fs.promises.readFile('./views/404pageNotFound.html', {encoding: 'UTF-8'}, (err, data) => {
             return data;
         })
     }).then((data) => {
@@ -23,6 +23,7 @@ http.createServer(function (req, res) {
         return loadView('footer');
     }).then((data) => {
         html += data;
+        res.writeHead(codeResponse, {'Content-Type': 'text/html'});
         res.write(html);
         res.end();
     });
