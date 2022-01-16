@@ -2,7 +2,16 @@ var http = require('http');
 var dt = require('./modules/dateModule');
 var url = require('url');
 var fs = require('fs'); 
-var uc = require('upper-case')
+var uc = require('upper-case');
+var events = require('events');
+
+
+var eventEmitter = new events.EventEmitter();
+
+var loadViewEvent = function (viewName) {  
+    console.log('A view was loaded: ' + viewName)
+}
+eventEmitter.on('viewLoaded', loadViewEvent);
 
 http.createServer(function (req, res) {
     var html = "";
@@ -36,9 +45,11 @@ function loadView(viewName) {
     if(viewName == "/"){
         viewName = 'home';
     }
+    eventEmitter.emit('viewLoaded', viewName);
 
     return Promise.resolve(fs.promises.readFile('./views/' + viewName + '.html', {encoding: 'UTF-8'}, (err, data) => {
         if (err) throw err;
         return data;
     }));
 }
+
