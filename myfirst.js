@@ -4,6 +4,7 @@ var url = require('url');
 var fs = require('fs'); 
 var uc = require('upper-case');
 var events = require('events');
+var formidable = require('formidable'); 
 
 
 var eventEmitter = new events.EventEmitter();
@@ -16,6 +17,20 @@ eventEmitter.on('viewLoaded', loadViewEvent);
 http.createServer(function (req, res) {
     var html = "";
     var codeResponse = 200;
+
+    if (req.url == '/fileupload') {
+        var form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            if(Object.keys(files).length !== 0 && files.filetoupload.size > 0){
+                var oldpath = files.filetoupload.filepath;
+                var newpath = './uploads/' + files.filetoupload.originalFilename;
+                fs.rename(oldpath, newpath, function (err) {
+                    if (err) throw err;
+                });
+            }
+        })
+    };
+
     loadView('header').then((data) => {
 
         html += data;
